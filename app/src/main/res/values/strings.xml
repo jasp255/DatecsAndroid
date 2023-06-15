@@ -48,4 +48,5 @@
     <string name="holder">Holder</string>
     <string name="exp_date">Exp date</string>
     <string name="no_card_read">No card information read</string>
+    <string name="title_close_connection">Disconnect</string>
 </resources>

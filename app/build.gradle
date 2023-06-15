@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 34
+    buildToolsVersion '34.0.0'
 
     defaultConfig {
         applicationId "com.datecs.examples.PrinterSample"
-        minSdkVersion 7
-        targetSdkVersion 24
+        minSdkVersion 19
+        targetSdkVersion 34
     }
 
     buildTypes {
@@ -16,8 +16,21 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    namespace 'com.datecs.examples.PrinterSample'
 }
 
 dependencies {
-    compile files('libs/com.datecs.api.jar')
+    api files('libs/com.datecs.api.jar')
+
+    // Android X
+    implementation 'androidx.appcompat:appcompat:1.7.0-alpha02'
+
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 }

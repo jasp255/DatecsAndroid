@@ -1,5 +1,7 @@
 package com.datecs.examples.PrinterSample;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -8,9 +10,11 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
@@ -57,8 +61,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-public class PrinterActivity extends Activity {
+public class PrinterActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "PrinterSample";
 
@@ -193,7 +200,7 @@ public class PrinterActivity extends Activity {
         findViewById(R.id.btn_fingerprint).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.content_buttons).setVisibility(View.INVISIBLE);
+                findViewById(R.id.content_buttons).setVisibility(View.GONE);
                 findViewById(R.id.content_fingerprint).setVisibility(View.VISIBLE);
             }
         });
@@ -236,6 +243,9 @@ public class PrinterActivity extends Activity {
             }
         });
 
+        //Chequear Permisos en Android
+        chequearPermisos();
+
         waitForConnection();
     }
 
@@ -247,6 +257,8 @@ public class PrinterActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == REQUEST_GET_DEVICE) {
             if (resultCode == DeviceListActivity.RESULT_OK) {
                 String address = data.getStringExtra(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
@@ -264,9 +276,9 @@ public class PrinterActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (findViewById(R.id.content_buttons).getVisibility() == View.INVISIBLE) {
+        if (findViewById(R.id.content_buttons).getVisibility() == View.GONE) {
             findViewById(R.id.content_buttons).setVisibility(View.VISIBLE);
-            findViewById(R.id.content_fingerprint).setVisibility(View.INVISIBLE);
+            findViewById(R.id.content_fingerprint).setVisibility(View.GONE);
         } else {
             super.onBackPressed();
         }
@@ -278,6 +290,7 @@ public class PrinterActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                status(text);
                 Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
             }
         });
@@ -289,6 +302,7 @@ public class PrinterActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                status(text);
                 Toast.makeText(getApplicationContext(), text, Toast.LENGTH_LONG).show();
             }
         });
@@ -320,11 +334,29 @@ public class PrinterActivity extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.w(LOG_TAG, "status=" + text);
                 if (text != null) {
                     findViewById(R.id.panel_status).setVisibility(View.VISIBLE);
                     ((TextView) findViewById(R.id.txt_status)).setText(text);
+                    ((TextView) findViewById(R.id.txt_status)).setBackgroundColor(Color.parseColor("#c0b60808")); //ROJO
                 } else {
-                    findViewById(R.id.panel_status).setVisibility(View.INVISIBLE);
+                    //findViewById(R.id.panel_status).setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+    private void statusok(final String text) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Log.w(LOG_TAG, "status=" + text);
+                if (text != null) {
+                    findViewById(R.id.panel_status).setVisibility(View.VISIBLE);
+                    ((TextView) findViewById(R.id.txt_status)).setText(text);
+                    ((TextView) findViewById(R.id.txt_status)).setBackgroundColor(Color.parseColor("#C003800D")); //VERDE
+                } else {
+                    //findViewById(R.id.panel_status).setVisibility(View.GONE);
                 }
             }
         });
@@ -539,6 +571,25 @@ public class PrinterActivity extends Activity {
             }
         });
 
+        if (isPrinterConnected()) {
+            statusok("Conectado");
+        }else{
+            status("No Conectado");
+        }
+
+    }
+
+    private boolean isPrinterConnected(){
+        try {
+            if (mPrinter.getStatus() == 0) {
+                return true;
+            }else{
+                return false;
+            }
+        } catch (Exception e) {
+            return false;
+            //throw new RuntimeException(e);
+        }
     }
 
     private synchronized void waitForConnection() {
@@ -589,6 +640,7 @@ public class PrinterActivity extends Activity {
 
         final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         final Thread t = new Thread(new Runnable() {
+            @SuppressLint("MissingPermission")
             @Override
             public void run() {
                 Log.d(LOG_TAG, "Connecting to " + address + "...");
@@ -1727,6 +1779,94 @@ public class PrinterActivity extends Activity {
             contactlessCard.waitRemove();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    final int MY_PERMISSIONS_BLUETOOTH = 0;
+
+
+    final String[] textoPermiso = { "BLUETOOTH_SCAN"};		  	// 0
+
+    private static String[] PERMISSIONS_BLUETOOTH_LIST = {
+            Manifest.permission.BLUETOOTH_SCAN, 		//Permiso principal
+            Manifest.permission.BLUETOOTH_CONNECT
+            //Manifest.permission.BLUETOOTH_PRIVILEGED
+    };
+
+    public void chequearPermisos() {
+        if (ContextCompat.checkSelfPermission(this,
+                PERMISSIONS_BLUETOOTH_LIST[0])
+                != PackageManager.PERMISSION_GRANTED) {
+            chequearPermisos(MY_PERMISSIONS_BLUETOOTH, true);
+        }
+    }
+
+    /**
+     * Chequear permiso a partir del indicado
+     *
+     * @param permisoChequear Será el permiso a chequear
+     * @param forzarPermiso Indica si fuerzo solicitar el permiso. En últimas versiones de Android hace caso omiso.
+     */
+    public void chequearPermisos(int permisoChequear, boolean forzarPermiso) {
+        System.out.println("chequearPermisos()  permisoChequear="+permisoChequear + " forzarPermiso="+forzarPermiso);
+
+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
+            //MY_PERMISSIONS_BLUETOOTH
+            if (permisoChequear == MY_PERMISSIONS_BLUETOOTH) {
+                if (ContextCompat.checkSelfPermission(this,
+                        PERMISSIONS_BLUETOOTH_LIST[0])
+                        != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            PERMISSIONS_BLUETOOTH_LIST[0])) {
+                        //Se solicitará permiso para poder almacenar audios en tu dispositivo
+                        ActivityCompat.requestPermissions(PrinterActivity.this,
+                                PERMISSIONS_BLUETOOTH_LIST,
+                                MY_PERMISSIONS_BLUETOOTH);
+                    } else {
+                        if (forzarPermiso)
+                            ActivityCompat.requestPermissions(this,
+                                    PERMISSIONS_BLUETOOTH_LIST,
+                                    MY_PERMISSIONS_BLUETOOTH);
+                    }
+
+                } else {
+                    System.out.println("chequearPermisos()  Permiso ya concedido previamente: MY_PERMISSIONS_BLUETOOTH");
+                    //Si este permiso ya está concedido, no solicito mas porque es el último
+                    //chequearPermisos(MY_PERMISSIONS_xxxxx, forzarPermiso);
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        System.out.println("onRequestPermissionsResult: requestCode" + requestCode);
+        switch (requestCode) {
+
+            case MY_PERMISSIONS_BLUETOOTH: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    //XXXXXXX();
+                } else {
+                    System.out.println("El usuario ha rechazado el permiso: " + requestCode + " que es " + textoPermiso[requestCode]);
+                }
+                break;
+            }
+
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    public void closeActiveConnection(View v){
+        if (isPrinterConnected()) {
+            closeActiveConnection();
+            status("Conexión cerrada");
         }
     }
 }

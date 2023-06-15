@@ -2,8 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DatecsAndroid.iml" filepath="$PROJECT_DIR$/DatecsAndroid.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/DatecsAndroid.iml" filepath="$PROJECT_DIR$/.idea/modules/DatecsAndroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DatecsAndroid.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DatecsAndroid.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DatecsAndroid.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DatecsAndroid.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DatecsAndroid.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DatecsAndroid.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/DatecsAndroid.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/DatecsAndroid.app.unitTest.iml" />
     </modules>
   </component>
 </project>
