@@ -249,7 +249,7 @@ public class PrinterActivity extends AppCompatActivity {
         //Chequear Permisos en Android
         chequearPermisos();
 
-        if (tienePermisosBluetooth()) {
+        if (tienePermisoBLUETOOTH()) {
             waitForConnection();
         }
     }
@@ -1962,22 +1962,32 @@ public class PrinterActivity extends AppCompatActivity {
 
     }
 
-    private boolean tienePermisosBluetooth(){
+    /**
+     * Indica si tiene el permiso de BLUETOOTH
+     * @return
+     */
+    private boolean tienePermisoBLUETOOTH(){
 
-        boolean tiene = true;
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        boolean tienePermiso = false;
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            //En versiones antiguas tiene permiso por defecto al bluetooth
+            tienePermiso = true;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (ContextCompat.checkSelfPermission(this,
                     PERMISSIONS_BLUETOOTH_LIST[0])
-                    != PackageManager.PERMISSION_GRANTED) {
-                tiene = false;
+                    == PackageManager.PERMISSION_GRANTED) {
+                tienePermiso = true;
             }else
             if (ContextCompat.checkSelfPermission(this,
                     PERMISSIONS_BLUETOOTH_LIST[1])
-                    != PackageManager.PERMISSION_GRANTED) {
-                tiene = false;
+                    == PackageManager.PERMISSION_GRANTED) {
+                tienePermiso = true;
             }
         }
-        return tiene;
+        return tienePermiso;
     }
 
     @Override
