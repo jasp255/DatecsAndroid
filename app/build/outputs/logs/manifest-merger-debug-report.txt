@@ -2,6 +2,8 @@
 manifest
 ADDED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:1-46:12
 INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:1-46:12
+INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:1-46:12
+INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:1-46:12
 MERGED from [androidx.constraintlayout:constraintlayout:2.1.4] C:\bin\Gradle\gradle-8.1.1\GRADLE_USER_HOME\caches\transforms-3\fba2f588e80c1a99111a8b92d417e30e\transformed\constraintlayout-2.1.4\AndroidManifest.xml:2:1-11:12
 MERGED from [androidx.appcompat:appcompat-resources:1.7.0-alpha02] C:\bin\Gradle\gradle-8.1.1\GRADLE_USER_HOME\caches\transforms-3\47e57dd995beb40aa43fa7432bf132d2\transformed\jetified-appcompat-resources-1.7.0-alpha02\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.appcompat:appcompat:1.7.0-alpha02] C:\bin\Gradle\gradle-8.1.1\GRADLE_USER_HOME\caches\transforms-3\21ced0cdb080e671d2edba1dcf664d3b\transformed\appcompat-1.7.0-alpha02\AndroidManifest.xml:17:1-22:12
@@ -32,9 +34,19 @@ MERGED from [androidx.arch.core:core-runtime:2.2.0-rc01] C:\bin\Gradle\gradle-8.
 MERGED from [androidx.interpolator:interpolator:1.0.0] C:\bin\Gradle\gradle-8.1.1\GRADLE_USER_HOME\caches\transforms-3\deb18b6000fabe28c42f846108914d69\transformed\interpolator-1.0.0\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.annotation:annotation-experimental:1.3.0] C:\bin\Gradle\gradle-8.1.1\GRADLE_USER_HOME\caches\transforms-3\fdd2710c84b62e6cc1f6ef9a4d3e7d7c\transformed\jetified-annotation-experimental-1.3.0\AndroidManifest.xml:17:1-22:12
 INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:1-46:12
+INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:1-46:12
+INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:1-46:12
 	package
 		ADDED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:3:5-48
 		INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml
+		INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml
+	android:versionName
+		INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml
+		ADDED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:1-46:12
+		INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml
+	android:versionCode
+		INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml
+		ADDED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:1-46:12
 		INJECTED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml
 	xmlns:android
 		ADDED from D:\Git\JASP255\DatecsAndroid\app\src\main\AndroidManifest.xml:2:11-69

@@ -61,6 +61,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -99,6 +100,8 @@ public class PrinterActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_printer);
+
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // Show Android device information and API version.
         final TextView txtVersion = (TextView) findViewById(R.id.txt_version);
@@ -246,13 +249,83 @@ public class PrinterActivity extends AppCompatActivity {
         //Chequear Permisos en Android
         chequearPermisos();
 
-        waitForConnection();
+        if (tienePermisosBluetooth()) {
+            waitForConnection();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         closeActiveConnection();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.i(LOG_TAG, "onResume");
+        ensureDiscoverable();
+
+    }
+
+    private boolean aceptadoPermisoBluetooth = false;
+    private BluetoothAdapter bluetoothAdapter;
+
+    private static final int SEGUNDOS_ESPERA_BLUETOOTH = 120;
+
+    private static final int ENABLE_REQUEST = 1;
+    private static final int DISCOVER_REQUEST = 2;
+
+    /**
+     * Verificar que el Bluetooth está activado y es accesible
+     */
+    private void ensureDiscoverable() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Log.i(LOG_TAG, "ensureDiscoverable. bluetoothAdapter=" + bluetoothAdapter +
+                ", aceptadoPermisoBluetooth=" + aceptadoPermisoBluetooth +
+                ", bluetoothAdapter.isDiscovering()=" + bluetoothAdapter.isDiscovering());
+
+        if (bluetoothAdapter == null) { //bluetooth not supported
+            Log.i(LOG_TAG, "ensureDiscoverable: bluetooth not supported");
+            Toast.makeText(this, getString(R.string.bluetoothNoSoportado), Toast.LENGTH_SHORT).show(); //No se muestra
+            finish();
+            return;
+        }
+
+        //Poner bluetooth ON
+        if (!bluetoothAdapter.isEnabled()){
+            Log.i(LOG_TAG, "ensureDiscoverable: !bluetoothAdapter.isEnabled()");
+            Intent i = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(i,ENABLE_REQUEST);
+
+        }
+
+        //Solicitar poner al descubierto
+        if (!bluetoothAdapter.isDiscovering() && !aceptadoPermisoBluetooth){
+            Log.i(LOG_TAG, "ensureDiscoverable: startActivityForResult(discoverableIntent, DISCOVER_REQUEST)");
+
+            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, SEGUNDOS_ESPERA_BLUETOOTH);
+            startActivityForResult(discoverableIntent, DISCOVER_REQUEST);
+
+        }else{
+            //Log.i(LOG_TAG, "imprimirAlgo");
+            //imprimirAlgo();
+            //waitForConnection();
+        }
+
+
+
     }
 
     @Override
@@ -269,6 +342,29 @@ public class PrinterActivity extends AppCompatActivity {
                     establishNetworkConnection(address);
                 }
             } else {
+                finish();
+            }
+        }
+
+        if(requestCode == ENABLE_REQUEST){
+            if(resultCode == RESULT_OK){
+            }
+            if(resultCode == RESULT_CANCELED){
+                Toast.makeText(this, "Necesitas habilitar el bluetooth.", Toast.LENGTH_SHORT).show();
+                status("Necesitas habilitar el bluetooth.");
+                finish();
+            }
+        }
+        if(requestCode == DISCOVER_REQUEST){
+            Log.i(LOG_TAG,"RESULT CODE: " + resultCode); //it is SEGUNDOS_ESPERA_BLUETOOTH
+            //if(resultCode ==  RESULT_OK){ //skipped
+            if (resultCode == SEGUNDOS_ESPERA_BLUETOOTH){ //BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION
+                //No hace falta poner aquí, ya que ONRESUME se volverá a ejecutar
+                //imprimirAlgo();
+                aceptadoPermisoBluetooth = true;
+
+            }
+            if(resultCode == RESULT_CANCELED){
                 finish();
             }
         }
@@ -1786,10 +1882,10 @@ public class PrinterActivity extends AppCompatActivity {
     final int MY_PERMISSIONS_BLUETOOTH = 0;
 
 
-    final String[] textoPermiso = { "BLUETOOTH_SCAN"};		  	// 0
+    final String[] textoPermiso = { "BLUETOOTH_SCAN", "BLUETOOTH_CONNECT"};		  	// 0
 
     private static String[] PERMISSIONS_BLUETOOTH_LIST = {
-            Manifest.permission.BLUETOOTH_SCAN, 		//Permiso principal
+            Manifest.permission.BLUETOOTH_SCAN,
             Manifest.permission.BLUETOOTH_CONNECT
             //Manifest.permission.BLUETOOTH_PRIVILEGED
     };
@@ -1797,6 +1893,11 @@ public class PrinterActivity extends AppCompatActivity {
     public void chequearPermisos() {
         if (ContextCompat.checkSelfPermission(this,
                 PERMISSIONS_BLUETOOTH_LIST[0])
+                != PackageManager.PERMISSION_GRANTED) {
+            chequearPermisos(MY_PERMISSIONS_BLUETOOTH, true);
+        }else
+        if (ContextCompat.checkSelfPermission(this,
+                PERMISSIONS_BLUETOOTH_LIST[1])
                 != PackageManager.PERMISSION_GRANTED) {
             chequearPermisos(MY_PERMISSIONS_BLUETOOTH, true);
         }
@@ -1832,14 +1933,51 @@ public class PrinterActivity extends AppCompatActivity {
                                     MY_PERMISSIONS_BLUETOOTH);
                     }
 
-                } else {
+                }
+                if (ContextCompat.checkSelfPermission(this,
+                        PERMISSIONS_BLUETOOTH_LIST[1])
+                        != PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                            PERMISSIONS_BLUETOOTH_LIST[1])) {
+                        //Se solicitará permiso para poder almacenar audios en tu dispositivo
+                        ActivityCompat.requestPermissions(PrinterActivity.this,
+                                PERMISSIONS_BLUETOOTH_LIST,
+                                MY_PERMISSIONS_BLUETOOTH);
+                    } else {
+                        if (forzarPermiso)
+                            ActivityCompat.requestPermissions(this,
+                                    PERMISSIONS_BLUETOOTH_LIST,
+                                    MY_PERMISSIONS_BLUETOOTH);
+                    }
+
+                }
+                else {
                     System.out.println("chequearPermisos()  Permiso ya concedido previamente: MY_PERMISSIONS_BLUETOOTH");
                     //Si este permiso ya está concedido, no solicito mas porque es el último
                     //chequearPermisos(MY_PERMISSIONS_xxxxx, forzarPermiso);
+                    waitForConnection();
                 }
             }
         }
 
+    }
+
+    private boolean tienePermisosBluetooth(){
+
+        boolean tiene = true;
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (ContextCompat.checkSelfPermission(this,
+                    PERMISSIONS_BLUETOOTH_LIST[0])
+                    != PackageManager.PERMISSION_GRANTED) {
+                tiene = false;
+            }else
+            if (ContextCompat.checkSelfPermission(this,
+                    PERMISSIONS_BLUETOOTH_LIST[1])
+                    != PackageManager.PERMISSION_GRANTED) {
+                tiene = false;
+            }
+        }
+        return tiene;
     }
 
     @Override
@@ -1850,10 +1988,14 @@ public class PrinterActivity extends AppCompatActivity {
 
             case MY_PERMISSIONS_BLUETOOTH: {
                 if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
                     //XXXXXXX();
+                    statusok("Permissions ok");
+                    waitForConnection();
                 } else {
                     System.out.println("El usuario ha rechazado el permiso: " + requestCode + " que es " + textoPermiso[requestCode]);
+                    status("No permissions");
                 }
                 break;
             }
