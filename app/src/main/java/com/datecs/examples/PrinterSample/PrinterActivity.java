@@ -1968,14 +1968,15 @@ public class PrinterActivity extends AppCompatActivity {
      */
     private boolean tienePermisoBLUETOOTH(){
 
+        if (true) return true;
         boolean tienePermiso = false;
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             //En versiones antiguas tiene permiso por defecto al bluetooth
             tienePermiso = true;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (ContextCompat.checkSelfPermission(this,
                     PERMISSIONS_BLUETOOTH_LIST[0])
                     == PackageManager.PERMISSION_GRANTED) {
@@ -2004,8 +2005,10 @@ public class PrinterActivity extends AppCompatActivity {
                     statusok("Permissions ok");
                     waitForConnection();
                 } else {
-                    System.out.println("El usuario ha rechazado el permiso: " + requestCode + " que es " + textoPermiso[requestCode]);
-                    status("No permissions");
+                    if (!tienePermisoBLUETOOTH()) {
+                        System.out.println("El usuario ha rechazado el permiso: " + requestCode + " que es " + textoPermiso[requestCode]);
+                        status("No permissions");
+                    }
                 }
                 break;
             }
