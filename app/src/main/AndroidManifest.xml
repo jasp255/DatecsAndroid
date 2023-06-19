@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.datecs.examples.PrinterSample" >
 
+    <uses-feature android:name="android.hardware.bluetooth"
+        android:required="true"/>
+    <uses-feature android:name="android.hardware.bluetooth_le"
+        android:required="true"/>
 
     <!-- Solicitar permisos de Bluetooth heredados en dispositivos más antiguos. -->
     <uses-permission android:name="android.permission.BLUETOOTH"
@@ -24,15 +28,21 @@
         android:theme="@style/Theme.AppCompat.Light">
 
         <activity
-            android:name=".PrinterActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="@string/app_name"
+            android:name=".SplashActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".PrinterActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Dialog"
+            android:exported="true">
         </activity>
         <activity
             android:name=".DeviceListActivity"            

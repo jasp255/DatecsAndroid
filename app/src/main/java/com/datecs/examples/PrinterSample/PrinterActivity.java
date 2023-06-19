@@ -99,9 +99,12 @@ public class PrinterActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Base_Theme_AppCompat);
         setContentView(R.layout.activity_printer);
 
+
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
 
         // Show Android device information and API version.
         final TextView txtVersion = (TextView) findViewById(R.id.txt_version);
@@ -1955,7 +1958,7 @@ public class PrinterActivity extends AppCompatActivity {
                     System.out.println("chequearPermisos()  Permiso ya concedido previamente: MY_PERMISSIONS_BLUETOOTH");
                     //Si este permiso ya está concedido, no solicito mas porque es el último
                     //chequearPermisos(MY_PERMISSIONS_xxxxx, forzarPermiso);
-                    waitForConnection();
+                    //waitForConnection();
                 }
             }
         }
@@ -1968,7 +1971,6 @@ public class PrinterActivity extends AppCompatActivity {
      */
     private boolean tienePermisoBLUETOOTH(){
 
-        if (true) return true;
         boolean tienePermiso = false;
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
